@@ -35,6 +35,9 @@ const schema = gql`
     createUser(name: String!): User!,
     createComment(message: String, rating: Float!, productId: ID!): Comment!
   }
+  type Subscription {
+    commentAdded(channelId: ID!): Comment
+  }
 `;
 
 export default schema;

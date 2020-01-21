@@ -16,6 +16,7 @@
     "express": "^4.17.1",
     "graphql-tag": "^2.10.1",
     "mongoose": "^5.8.7",
+    "subscriptions-transport-ws": "^0.9.16",
     "uuid": "^3.4.0"
   },
   "devDependencies": {

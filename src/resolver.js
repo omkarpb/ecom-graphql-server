@@ -1,5 +1,8 @@
+const { PubSub } = require('apollo-server');
 import { getCurrentDate } from './utility';
 
+const COMMENT_ADDED = 'COMMENT_ADDED';
+const pubsub = new PubSub();
 const resolvers = {
   Query: {
     user: async (_, { id }, { db: { User } }) => {
@@ -66,6 +69,7 @@ const resolvers = {
       const product = await Product.findById(productId);
       product.comments.push(comment);
       await product.save();
+      pubsub.publish(COMMENT_ADDED, { commentAdded: res });
       return comment;
     },
     createUser: async (_, {name}, { db: { User } }) => {
@@ -73,7 +77,12 @@ const resolvers = {
       await user.save();
       return user;
     }
-  }
+  },
+  Subscription: {
+    commentAdded: {
+      subscribe: () => pubsub.asyncIterator([COMMENT_ADDED]),
+    },
+  },
 }
 
 export default resolvers;

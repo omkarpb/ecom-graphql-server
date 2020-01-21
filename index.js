@@ -1,5 +1,6 @@
 import cors from 'cors';
 import express from 'express';
+import http from 'http';
 import { ApolloServer } from 'apollo-server-express';
 import mongoose from 'mongoose';
 
@@ -9,6 +10,7 @@ import Product from './src/models/products.model';
 import Comment from './src/models/comments.model';
 import User from './src/models/users.model';
 
+const PORT = 5000;
 const app = express();
 app.use(cors());
 
@@ -22,6 +24,7 @@ db.once("open", function () {
 const server = new ApolloServer({
   typeDefs: schema,
   resolvers,
+  tracing: true,
   context: {
     currentUser: {
       id: '5e22b1f8654c95ca2066b8f0'
@@ -36,6 +39,10 @@ const server = new ApolloServer({
 
 server.applyMiddleware({ app, path: '/graphql' });
 
-app.listen({ port: 5000 }, () => {
-  console.log('Apollo Server on http://localhost:5000/graphql');
-});
+const httpServer = http.createServer(app);
+server.installSubscriptionHandlers(httpServer);
+
+httpServer.listen(PORT, () => {
+  console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`)
+  console.log(`🚀 Subscriptions ready at ws://localhost:${PORT}${server.subscriptionsPath}`)
+})
